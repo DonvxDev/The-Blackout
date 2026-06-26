@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Blackout - Shooter Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-bottom: 2px solid #ff0000;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .game-box {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 10px;
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .game-box h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .info {
+            margin: 20px 0;
+            font-size: 14px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .controls {
+            margin-top: 30px;
+        }
+
+        button {
+            background: #ff0000;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #cc0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .console {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid #ff0000;
+            overflow-y: auto;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #00ff00;
+        }
+
+        .console-entry {
+            margin: 2px 0;
+        }
+
+        .console-error {
+            color: #ff6666;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚫ THE BLACKOUT ⚫</h1>
+            <p>Professional PC Shooter Game - v1.0.0</p>
+        </div>
+
+        <div class="content">
+            <div class="game-box">
+                <h2>Welcome, Operative</h2>
+                
+                <div class="info">
+                    <strong>Game Features:</strong><br>
+                    ✓ WASD Movement System<br>
+                    ✓ Multiple Weapons (AK-47, Shotgun, Sniper, Rocket)<br>
+                    ✓ Enemy AI (Shooters, Brutes, Scouts, Revenants)<br>
+                    ✓ Dynamic Map System (Deasered, Vensiea)<br>
+                    ✓ Professional Physics Engine<br>
+                    ✓ Optimized for 144 FPS
+                </div>
+
+                <div class="info" style="font-size: 12px; color: #888;">
+                    <strong>System Info:</strong><br>
+                    Platform: Windows PC<br>
+                    Engine: Custom C++ Shooter Engine<br>
+                    Target: 144 FPS
+                </div>
+
+                <div class="controls">
+                    <button id="playBtn">▶ PLAY GAME</button>
+                    <button id="stopBtn" disabled>⏹ STOP GAME</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="console" id="console"></div>
+        <div class="footer">
+            The Blackout © 2026 | Built with C++ & Electron | GitHub: yourusername/the-blackout
+        </div>
+    </div>
+
+    <script>
+        const playBtn = document.getElementById('playBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const consoleDiv = document.getElementById('console');
+
+        function addConsoleOutput(text, isError = false) {
+            const entry = document.createElement('div');
+            entry.className = 'console-entry' + (isError ? ' console-error' : '');
+            entry.textContent = text;
+            consoleDiv.appendChild(entry);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        playBtn.addEventListener('click', () => {
+            playBtn.disabled = true;
+            stopBtn.disabled = false;
+            consoleDiv.innerHTML = '';
+            addConsoleOutput('Starting game...');
+            window.electronAPI.startGame();
+        });
+
+        stopBtn.addEventListener('click', () => {
+            playBtn.disabled = false;
+            stopBtn.disabled = true;
+            addConsoleOutput('[SYSTEM] Game stopped by user');
+            window.electronAPI.stopGame();
+        });
+
+        window.electronAPI.onGameOutput((data) => {
+            addConsoleOutput(data);
+        });
+
+        window.electronAPI.onGameError((data) => {
+            addConsoleOutput(data, true);
+        });
+
+        window.electronAPI.onGameEnded((code) => {
+            playBtn.disabled = false;
+            stopBtn.disabled = true;
+            addConsoleOutput(`[SYSTEM] Game ended with code ${code}`);
+        });
+    </script>
+</body>
+</html>
